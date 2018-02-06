@@ -43,4 +43,4 @@ var webCapture = new WebCaptureClient(
 
 ````
 
-2. Open the UI and enter the url where your project is running
+2. [Open the UI](https://tdhooper.github.io/web-frames-capture/server/) and enter the url where your project is running
