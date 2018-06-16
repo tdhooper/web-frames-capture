@@ -41,8 +41,7 @@ WebCaptureClient.prototype.receiveMessage = function(event) {
     var message = event.data.webcapture.message;
     switch (name) {
         case 'setup':
-            this.setup(message);
-            setTimeout(this.ready.bind(this), 100);
+            this.setup(message, this.ready.bind(this));
             break;
         case 'teardown':
             this.teardown();
@@ -51,8 +50,7 @@ WebCaptureClient.prototype.receiveMessage = function(event) {
             this.render(message);
             break;
         case 'capture':
-            this.render(message);
-            this.sendImageData();
+            this.render(message, this.sendImageData.bind(this));
             break;
     }
 };

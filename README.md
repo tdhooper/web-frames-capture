@@ -11,18 +11,20 @@ $ npm install --save web-frames-capture
 ````javascript
 const WebCaptureClient = require('web-frames-capture');
 
-var captureSetup = function(config) {
+var captureSetup = function(config, done) {
     // Configure your scene with config.width and config.height,
     // you'll probably want to stop animation and reset your timer
     // to 0
+    done();
 };
 
 var captureTeardown = function() {
     // Restore your scene as it was before captureSetup
 };
 
-var captureRender = function(milliseconds) {
+var captureRender = function(milliseconds, done) {
     // Draw your scene at the given time
+    done();
 };
 
 // Default config used by the UI
