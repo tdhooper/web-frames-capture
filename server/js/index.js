@@ -18,6 +18,8 @@ function settingsChanged() {
         var value = input.value;
         if (input.type == 'number') {
             value = parseFloat(value);
+        } else if (input.type == 'checkbox') {
+            value = input.checked;
         }
         config[name] = value;
     }
@@ -32,7 +34,11 @@ var setConfig = function(newConfig) {
     for (var i = 0; i < inputs.length; i++) {
         var input = inputs[i];
         var name = input.id.split('-')[0];
-        input.value = config[name];
+        if (input.type == 'checkbox') {
+            input.checked = config[name];
+        } else {
+            input.value = config[name];
+        }
     }
 };
 
@@ -96,6 +102,7 @@ Controller.prototype.start = function() {
     this.counter.start(
         config.fps,
         config.seconds,
+        config.quads,
         this.render.bind(this),
         this.end.bind(this)
     );
@@ -105,8 +112,8 @@ Controller.prototype.stop = function() {
     this.counter.stop();
 };
 
-Controller.prototype.render = function(milliseconds) {
-    sendMessage(this.type, milliseconds);
+Controller.prototype.render = function(milliseconds, quad) {
+    sendMessage(this.type, [milliseconds, quad]);
 };
 
 Controller.prototype.end = function() {
@@ -130,6 +137,9 @@ var save = function(blob) {
     var totalFrames = captureCounter.totalFrames;
     var digits = totalFrames.toString().length;
     var frameString = pad(captureCounter.frame, digits);
+    if (captureCounter.quads) {
+        frameString += '_' + captureCounter.quad;
+    }
     var filename = config.prefix + frameString + '.png';
     saveAs(blob, filename);
 };

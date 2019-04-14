@@ -1,9 +1,17 @@
 
 var CaptureCounter = function() {};
 
-CaptureCounter.prototype.start = function(fps, duration, renderCallback, endCallback) {
+CaptureCounter.prototype.start = function(
+    fps,
+    duration,
+    quads,
+    renderCallback,
+    endCallback
+) {
     this.running = true;
     this.frame = 0;
+    this.quads = quads;
+    this.quad = 0;
     this.frameDuration = 1 / fps;
     this.duration = duration;
     this.totalFrames = Math.floor(fps * duration);
@@ -18,10 +26,20 @@ CaptureCounter.prototype.ready = function() {
 };
 
 CaptureCounter.prototype.tick = function() {
-    this.renderCallback(this.frame * this.frameDuration * 1000);
+    this.renderCallback(
+        this.frame * this.frameDuration * 1000,
+        this.quads ? this.quad : undefined
+    );
 };
 
 CaptureCounter.prototype.rendered = function() {
+    console.log(this.quad);
+    if (this.quads && this.quad < 3) {
+        this.quad += 1;
+        this.tick();
+        return;
+    }
+    this.quad = 0;
     this.frame += 1;
     if (this.frame * this.frameDuration >= this.duration) {
         this.stop();

@@ -47,10 +47,10 @@ WebCaptureClient.prototype.receiveMessage = function(event) {
             this.teardown();
             break;
         case 'preview':
-            this.render(message);
+            this.render(message[0], message[1]);
             break;
         case 'capture':
-            this.render(message, this.sendImageData.bind(this));
+            this.render(message[0], message[1], this.sendImageData.bind(this));
             break;
     }
 };

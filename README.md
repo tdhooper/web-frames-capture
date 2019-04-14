@@ -22,8 +22,10 @@ var captureTeardown = function() {
     // Restore your scene as it was before captureSetup
 };
 
-var captureRender = function(milliseconds, done) {
+var captureRender = function(milliseconds, quad, done) {
     // Draw your scene at the given time
+    // If quads is enabled, quad counts from 0 to 3 for each frame,
+    // otherwise it's undefined
     done();
 };
 
@@ -32,7 +34,8 @@ var captureConfig = {
   fps: 30,
   seconds: 2, // (duration)
   width: 1200,
-  height: 1200
+  height: 1200,
+  quad: true // optional, render each frame 4 times, for splitting a screen into quads
 };
 
 var webCapture = new WebCaptureClient(

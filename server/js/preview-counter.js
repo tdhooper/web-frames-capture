@@ -1,9 +1,10 @@
 
 var PreviewCounter = function() {};
 
-PreviewCounter.prototype.start = function(fps, duration, renderCallback, endCallback) {
+PreviewCounter.prototype.start = function(fps, duration, quads, renderCallback, endCallback) {
     this.running = true;
     this.frame = 0;
+    this.quads = quads;
     this.frameDuration = 1 / fps;
     this.duration = duration;
     this.renderCallback = renderCallback;
@@ -17,7 +18,10 @@ PreviewCounter.prototype.ready = function() {
 };
 
 PreviewCounter.prototype.tick = function() {
-    this.renderCallback(this.frame * this.frameDuration * 1000);
+    this.renderCallback(
+        this.frame * this.frameDuration * 1000,
+        this.quads ? 0 : undefined
+    );
     this.frame += 1;
     if (this.frame * this.frameDuration >= this.duration) {
         this.frame = 0;
