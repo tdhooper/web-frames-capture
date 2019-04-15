@@ -1,6 +1,6 @@
 {
   "name": "web-frames-capture",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Capture canvas animations as a PNG sequence",
   "main": "client.js",
   "author": "Thomas Hooper",
