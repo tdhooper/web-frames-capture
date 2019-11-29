@@ -1,9 +1,9 @@
 
 var PreviewCounter = function() {};
 
-PreviewCounter.prototype.start = function(fps, duration, quads, renderCallback, endCallback) {
+PreviewCounter.prototype.start = function(fps, duration, startFrame, quads, renderCallback, endCallback) {
     this.running = true;
-    this.frame = 0;
+    this.frame = startFrame;
     this.quads = quads;
     this.frameDuration = 1 / fps;
     this.duration = duration;

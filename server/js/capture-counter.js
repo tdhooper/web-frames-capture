@@ -4,12 +4,13 @@ var CaptureCounter = function() {};
 CaptureCounter.prototype.start = function(
     fps,
     duration,
+    startFrame,
     quads,
     renderCallback,
     endCallback
 ) {
     this.running = true;
-    this.frame = 0;
+    this.frame = startFrame;
     this.quads = quads;
     this.quad = 0;
     this.frameDuration = 1 / fps;

@@ -102,6 +102,7 @@ Controller.prototype.start = function() {
     this.counter.start(
         config.fps,
         config.seconds,
+        config.start,
         config.quads,
         this.render.bind(this),
         this.end.bind(this)
