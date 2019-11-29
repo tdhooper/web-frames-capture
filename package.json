@@ -2,8 +2,29 @@
   "name": "web-frames-capture",
   "version": "1.0.0",
   "description": "Capture canvas animations as a PNG sequence",
-  "main": "client.js",
+  "main": "src/index.js",
+  "scripts": {
+    "cli": "src/cli.js"
+  },
   "author": "Thomas Hooper",
   "license": "MIT",
-  "repository": "github:tdhooper/web-frames-capture"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tdhooper/web-frames-capture.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tdhooper/web-frames-capture/issues"
+  },
+  "homepage": "https://github.com/tdhooper/web-frames-capture#readme",
+  "dependencies": {
+    "browserify": "^16.5.0",
+    "finalhandler": "^1.1.2",
+    "hyperstream": "^1.2.2",
+    "open": "^7.0.0",
+    "router": "^1.3.3",
+    "simple-html-index": "^1.5.0"
+  },
+  "bin": {
+    "web-frames-capture": "src/cli.js"
+  }
 }
