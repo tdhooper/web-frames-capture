@@ -34,7 +34,7 @@ const server = http.createServer((request, response) => {
 
 server.on('listening', () => {
   const { port } = server.address();
-  open(`http://localhost:${port}`);
+  open(`http://localhost:${port}?url=${url}`);
 });
 
 server.listen();
