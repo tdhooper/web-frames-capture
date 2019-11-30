@@ -1,4 +1,3 @@
-const { saveAs } = require('file-saver');
 
 const pad = (number, length) => {
   let str = `${number}`;
@@ -8,7 +7,7 @@ const pad = (number, length) => {
   return str;
 };
 
-const save = (blob, config, counter) => {
+const saveName = (config, counter) => {
   const { totalFrames } = counter;
   const digits = totalFrames.toString().length;
   let frameString = pad(counter.frame, digits);
@@ -16,7 +15,7 @@ const save = (blob, config, counter) => {
     frameString += `_${counter.quad}`;
   }
   const filename = `${config.prefix}${frameString}.png`;
-  saveAs(blob, filename);
+  return filename;
 };
 
-module.exports = save;
+module.exports = saveName;

@@ -1,11 +1,12 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 /* eslint space-unary-ops: [2, { "overrides": {"!": true} }] */
 
+const { saveAs } = require('file-saver');
 const CaptureCounter = require('../capture-counter');
 const PreviewCounter = require('../preview-counter');
 const { GUIController } = require('../controller');
 const configGui = require('./config-gui');
-const save = require('./save');
+const saveName = require('../save-name');
 
 const urlInput = document.getElementById('url-input');
 const params = new URLSearchParams(window.location.search);
@@ -40,7 +41,7 @@ const receiveMessage = (event) => {
       previewCounter.ready();
       break;
     case 'rendered':
-      save(message, configGui.config, captureCounter);
+      saveAs(message, saveName(configGui.config, captureCounter));
       captureCounter.rendered();
       break;
     default:

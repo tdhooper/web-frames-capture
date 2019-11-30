@@ -1,6 +1,7 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 /* eslint space-unary-ops: [2, { "overrides": {"!": true} }] */
 
+const saveName = require('./save-name');
 const CaptureCounter = require('./capture-counter');
 const { Controller } = require('./controller');
 
@@ -12,8 +13,15 @@ iframe.setAttribute('src', url);
 
 const config = {};
 
-const captureCounter = new CaptureCounter();
-const controller = new Controller(iframe, config, 'capture', captureCounter);
+const counter = new CaptureCounter();
+const controller = new Controller(iframe, config, 'capture', counter);
+
+controller.on('end', () => {
+  fetch('/done', { method: 'POST' })
+    .then(() => {
+      window.close();
+    });
+});
 
 const setConfig = (newConfig) => {
   if (typeof newConfig !== 'object') {
@@ -21,6 +29,16 @@ const setConfig = (newConfig) => {
   }
   Object.assign(config, newConfig);
   controller.start();
+};
+
+const upload = (blob, name) => {
+  const form = new FormData();
+  form.append('image', blob, name);
+  const f = fetch('/save', {
+    method: 'POST',
+    body: form,
+  });
+  return f.then(response => response.text());
 };
 
 const receiveMessage = (event) => {
@@ -36,11 +54,11 @@ const receiveMessage = (event) => {
       setConfig(message);
       break;
     case 'ready':
-      captureCounter.ready();
+      counter.ready();
       break;
     case 'rendered':
-      //save(message, configGui.config, captureCounter);
-      captureCounter.rendered();
+      upload(message, saveName(config, counter))
+        .then(counter.rendered.bind(counter));
       break;
     default:
       break;

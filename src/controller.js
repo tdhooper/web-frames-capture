@@ -1,10 +1,12 @@
+const EventEmitter = require('events');
 
 const prop = (object, key, fallback) => (
   object.hasOwnProperty(key) ? object[key] : fallback
 );
 
-class Controller {
+class Controller extends EventEmitter {
   constructor(iframe, config, type, counter) {
+    super();
     this.iframe = iframe;
     this.config = config;
     this.type = type;
@@ -37,6 +39,7 @@ class Controller {
     this.sendMessage('teardown');
     this.iframe.width = undefined;
     this.iframe.height = undefined;
+    this.emit('end');
   }
 
   sendMessage(name, message) {
