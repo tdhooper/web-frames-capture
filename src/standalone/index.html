@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <title>Web Frames Capture</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+        <div class="controls">
+            <form method="get">
+                <label for="url-input">URL:</label>
+                <input id="url-input" type="text" name="url" placeholder="http://" />
+                <button id="url-submit" type="submit">Load</button>
+            </form>
+            <div class="settings">
+                <label for="width-input">Width:</label>
+                <input type="number" id="width-input" value="500" />
+                <label for="height-input">Height:</label>
+                <input type="number" id="height-input" value="500" />
+                <label for="fps-input">FPS:</label>
+                <input type="number" id="fps-input" value="30" />
+                <label for="seconds-input">Seconds:</label>
+                <input type="number" id="seconds-input" value="1" />
+                <label for="start-input">Start frame:</label>
+                <input type="number" id="start-input" value="0" />
+                <label for="quads-input">Quads:</label>
+                <input type="checkbox" id="quads-input" value="false" />
+                <label for="prefix-input">Prefix:</label>
+                <input type="text" id="prefix-input" value="img" />
+
+                <button id="preview" type="submit">Preview</button>
+                <button id="capture" type="submit">Capture</button>
+
+                <button id="stop" type="submit" disabled>Stop</button>
+
+            </div>
+        </div>
+        <iframe id="target-iframe"></iframe>
+
+        <script src="index.js"></script>
+    </body>
+</html>

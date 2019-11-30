@@ -1,14 +1,13 @@
 
-var CaptureCounter = function() {};
-
-CaptureCounter.prototype.start = function(
+class CaptureCounter {
+  start(
     fps,
     duration,
     startFrame,
     quads,
     renderCallback,
-    endCallback
-) {
+    endCallback,
+  ) {
     this.running = true;
     this.frame = startFrame;
     this.quads = quads;
@@ -18,40 +17,42 @@ CaptureCounter.prototype.start = function(
     this.totalFrames = Math.floor(fps * duration);
     this.renderCallback = renderCallback;
     this.endCallback = endCallback;
-};
+  }
 
-CaptureCounter.prototype.ready = function() {
+  ready() {
     if (this.running) {
-        this.tick();
+      this.tick();
     }
-};
+  }
 
-CaptureCounter.prototype.tick = function() {
+  tick() {
     this.renderCallback(
-        this.frame * this.frameDuration * 1000,
-        this.quads ? this.quad : undefined
+      this.frame * this.frameDuration * 1000,
+      this.quads ? this.quad : undefined,
     );
-};
+  }
 
-CaptureCounter.prototype.rendered = function() {
-    console.log(this.quad);
+  rendered() {
     if (this.quads && this.quad < 3) {
-        this.quad += 1;
-        this.tick();
-        return;
+      this.quad += 1;
+      this.tick();
+      return;
     }
     this.quad = 0;
     this.frame += 1;
     if (this.frame * this.frameDuration >= this.duration) {
-        this.stop();
-        return;
+      this.stop();
+      return;
     }
     this.tick();
-};
+  }
 
-CaptureCounter.prototype.stop = function() {
+  stop() {
     if (this.running) {
-        this.running = false;
-        this.endCallback();
+      this.running = false;
+      this.endCallback();
     }
-};
+  }
+}
+
+module.exports = CaptureCounter;

@@ -4,7 +4,8 @@
   "description": "Capture canvas animations as a PNG sequence",
   "main": "src/index.js",
   "scripts": {
-    "cli": "src/cli.js"
+    "cli": "src/cli.js",
+    "build": "./build.js"
   },
   "author": "Thomas Hooper",
   "license": "MIT",
@@ -26,5 +27,9 @@
   },
   "bin": {
     "web-frames-capture": "src/cli.js"
+  },
+  "devDependencies": {
+    "file-saver": "^2.0.2",
+    "fs-extra": "^8.1.0"
   }
 }

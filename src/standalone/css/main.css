@@ -1,0 +1,28 @@
+body {
+    display: flex;
+}
+
+.controls {
+    margin-right: 10px;
+}
+
+#target-iframe {
+    flex-shrink: 0;
+}
+
+label, input, button {
+    display: block;
+}
+
+label, button {
+    margin-top: 10px;
+}
+
+.controls > label {
+    margin-top: 0;
+}
+
+#preview {
+    float: left;
+    margin-right: 10px;
+}
