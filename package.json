@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/tdhooper/web-frames-capture#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "browserify": "^16.5.0",
+    "cli-progress": "^3.4.0",
     "finalhandler": "^1.1.2",
     "multiparty": "^4.2.1",
     "open": "^7.0.0",

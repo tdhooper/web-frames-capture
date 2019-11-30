@@ -9,8 +9,10 @@ const finalhandler = require('finalhandler');
 const Router = require('router');
 const html = require('simple-html-index');
 const multiparty = require('multiparty');
+const bodyParser = require('body-parser')
 const open = require('open');
 const browserify = require('browserify');
+const cliProgress = require('cli-progress');
 
 const url = process.argv[2];
 let saveLocation = process.argv[3];
@@ -23,6 +25,8 @@ if ( ! fs.existsSync(saveLocation)) {
   console.error(`${saveLocation} does not exist`);
   process.exit(1);
 }
+
+const progress = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 
 const router = Router();
 
@@ -40,6 +44,12 @@ router.get('/index.js', (request, response) => {
     .pipe(response);
 });
 
+router.post('/start', (request, response) => {
+  const config = request.body;
+  progress.start(config.fps * config.seconds, 0);
+  response.end();
+});
+
 router.post('/save', (request, response) => {
   const form = new multiparty.Form({
     autoFiles: true,
@@ -49,7 +59,7 @@ router.post('/save', (request, response) => {
     const filename = path.join(saveLocation, file.originalFilename);
     fs.renameSync(file.path, filename);
     response.end(file.originalFilename);
-    console.log(`Saved ${filename}`);
+    progress.increment();
   });
 
   form.parse(request);
@@ -57,11 +67,16 @@ router.post('/save', (request, response) => {
 
 router.post('/done', (request, response) => {
   response.end();
+  progress.stop();
   process.exit();
 });
 
+const jsonParser = bodyParser.json();
+
 const server = http.createServer((request, response) => {
-  router(request, response, finalhandler(request, response));
+  jsonParser(request, response, () => {
+    router(request, response, finalhandler(request, response));
+  });
 });
 
 server.on('listening', () => {

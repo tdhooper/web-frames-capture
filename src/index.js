@@ -29,6 +29,11 @@ const setConfig = (newConfig) => {
   }
   Object.assign(config, newConfig);
   controller.start();
+  fetch('/start', {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify(newConfig),
+  });
 };
 
 const upload = (blob, name) => {
