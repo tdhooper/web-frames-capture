@@ -16,9 +16,22 @@ const config = {};
 const counter = new CaptureCounter();
 const controller = new Controller(iframe, config, 'capture', counter);
 
+let stopped = false;
+
 controller.on('end', () => {
   fetch('/done', { method: 'POST' })
     .then(() => {
+      stopped = true;
+      window.close();
+    });
+});
+
+window.addEventListener('beforeunload', (event) => {
+  event.preventDefault();
+  event.returnValue = '';
+  fetch('/done', { method: 'POST' })
+    .then(() => {
+      stopped = true;
       window.close();
     });
 });
