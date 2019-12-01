@@ -9,31 +9,45 @@ const params = new URLSearchParams(window.location.search);
 const url = params.get('url');
 const iframe = document.createElement('iframe');
 document.body.appendChild(iframe);
-iframe.setAttribute('src', url);
+
+const ws = new WebSocket('ws://localhost:8080');
+ws.onopen = () => {
+  iframe.setAttribute('src', url);
+};
+
+const handlers = {};
+
+handlers.close = () => {
+  window.close();
+};
+
+window.addEventListener('beforeunload', (event) => {
+  ws.send(JSON.stringify({
+    type: 'exit',
+  }));
+});
+
+ws.onmessage = (message) => {
+  let data;
+  try {
+    data = JSON.parse(message.data);
+  } catch(error) {
+    return;
+  }
+  const handler = handlers[data.type];
+  if (handler) {
+    handler(data.data);
+  }
+};
 
 const config = {};
-
 const counter = new CaptureCounter();
 const controller = new Controller(iframe, config, 'capture', counter);
 
-let stopped = false;
-
 controller.on('end', () => {
-  fetch('/done', { method: 'POST' })
-    .then(() => {
-      stopped = true;
-      window.close();
-    });
-});
-
-window.addEventListener('beforeunload', (event) => {
-  event.preventDefault();
-  event.returnValue = '';
-  fetch('/done', { method: 'POST' })
-    .then(() => {
-      stopped = true;
-      window.close();
-    });
+  ws.send(JSON.stringify({
+    type: 'done',
+  }));
 });
 
 const setConfig = (newConfig) => {
@@ -42,11 +56,10 @@ const setConfig = (newConfig) => {
   }
   Object.assign(config, newConfig);
   controller.start();
-  fetch('/start', {
-    method: 'POST',
-    headers: {'content-type': 'application/json'},
-    body: JSON.stringify(newConfig),
-  });
+  ws.send(JSON.stringify({
+    type: 'start',
+    data: config,
+  }));
 };
 
 const upload = (blob, name) => {

@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const WebSocket = require('ws');
 const http = require('http');
 const finalhandler = require('finalhandler');
 const Router = require('router');
@@ -28,6 +29,45 @@ if ( ! fs.existsSync(saveLocation)) {
 
 const progress = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 
+const wss = new WebSocket.Server({ port: 8080 });
+wss.on('connection', (ws) => {
+  const handlers = {};
+
+  handlers.start = (config) => {
+    progress.start(config.fps * config.seconds, 0);
+  };
+
+  handlers.done = () => {
+    progress.stop();
+    ws.send(JSON.stringify({type: 'close'}));
+    process.exit();
+  };
+
+  handlers.exit = () => {
+    progress.stop();
+    process.exit();
+  };
+
+  process.on('SIGINT', () => {
+    ws.send(JSON.stringify({type: 'close'}));
+    console.log(''); // exit on a new line
+    process.exit();
+  });
+
+  ws.on('message', (message) => {
+    let data;
+    try {
+      data = JSON.parse(message);
+    } catch(error) {
+      return;
+    }
+    const handler = handlers[data.type];
+    if (handler) {
+      handler(data.data);
+    }
+  });
+});
+
 const router = Router();
 
 router.get('/', (request, response) => {
@@ -45,12 +85,6 @@ router.get('/index.js', (request, response) => {
     .pipe(response);
 });
 
-router.post('/start', (request, response) => {
-  const config = request.body;
-  progress.start(config.fps * config.seconds, 0);
-  response.end();
-});
-
 router.post('/save', (request, response) => {
   const form = new multiparty.Form({
     autoFiles: true,
@@ -64,12 +98,6 @@ router.post('/save', (request, response) => {
   });
 
   form.parse(request);
-});
-
-router.post('/done', (request, response) => {
-  response.end();
-  progress.stop();
-  process.exit();
 });
 
 const jsonParser = bodyParser.json();
