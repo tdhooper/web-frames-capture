@@ -4,6 +4,7 @@
 const saveName = require('./save-name');
 const CaptureCounter = require('./capture-counter');
 const { Controller } = require('./controller');
+const WSRouter = require('./wsrouter');
 
 const params = new URLSearchParams(window.location.search);
 const url = params.get('url');
@@ -15,10 +16,14 @@ ws.onopen = () => {
   iframe.setAttribute('src', url);
 };
 
-const handlers = {};
+const wsRouter = new WSRouter();
 
-handlers.close = () => {
+wsRouter.on('close', () => {
   window.close();
+});
+
+ws.onmessage = (message) => {
+  wsRouter.onmessage(message.data);
 };
 
 window.addEventListener('beforeunload', (event) => {
@@ -26,19 +31,6 @@ window.addEventListener('beforeunload', (event) => {
     type: 'exit',
   }));
 });
-
-ws.onmessage = (message) => {
-  let data;
-  try {
-    data = JSON.parse(message.data);
-  } catch(error) {
-    return;
-  }
-  const handler = handlers[data.type];
-  if (handler) {
-    handler(data.data);
-  }
-};
 
 const config = {};
 const counter = new CaptureCounter();

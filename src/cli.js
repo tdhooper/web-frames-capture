@@ -14,6 +14,7 @@ const bodyParser = require('body-parser');
 const open = require('open');
 const browserify = require('browserify');
 const cliProgress = require('cli-progress');
+const WSRouter = require('./wsrouter');
 
 const url = process.argv[2];
 let saveLocation = process.argv[3];
@@ -31,22 +32,22 @@ const progress = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classi
 
 const wss = new WebSocket.Server({ port: 8080 });
 wss.on('connection', (ws) => {
-  const handlers = {};
+  const wsRouter = new WSRouter();
 
-  handlers.start = (config) => {
+  wsRouter.on('start', (config) => {
     progress.start(config.fps * config.seconds, 0);
-  };
+  });
 
-  handlers.done = () => {
+  wsRouter.on('done', () => {
     progress.stop();
     ws.send(JSON.stringify({type: 'close'}));
     process.exit();
-  };
+  });
 
-  handlers.exit = () => {
+  wsRouter.on('exit', () => {
     progress.stop();
     process.exit();
-  };
+  });
 
   process.on('SIGINT', () => {
     ws.send(JSON.stringify({type: 'close'}));
@@ -54,18 +55,7 @@ wss.on('connection', (ws) => {
     process.exit();
   });
 
-  ws.on('message', (message) => {
-    let data;
-    try {
-      data = JSON.parse(message);
-    } catch(error) {
-      return;
-    }
-    const handler = handlers[data.type];
-    if (handler) {
-      handler(data.data);
-    }
-  });
+  ws.on('message', wsRouter.onmessage.bind(wsRouter));
 });
 
 const router = Router();
