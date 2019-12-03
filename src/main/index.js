@@ -66,7 +66,7 @@ const pmevents = new PostMessageEmitter();
 
 pmevents.on('config', setConfig);
 
-pmevents.on('ready', counter.ready);
+pmevents.on('ready', () => counter.ready());
 
 pmevents.on('rendered', (message) => {
   upload(message, saveName(config, counter))

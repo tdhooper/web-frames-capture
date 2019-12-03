@@ -68,7 +68,7 @@ router.get('/', (request, response) => {
 router.get('/index.js', (request, response) => {
   const scriptDir = path.dirname(require.main.filename);
   browserify()
-    .add(path.join(scriptDir, 'index.js'))
+    .add(path.join(scriptDir, 'main/index.js'))
     .bundle()
     .pipe(response);
 });

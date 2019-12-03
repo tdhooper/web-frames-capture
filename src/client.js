@@ -1,10 +1,13 @@
 const PostMessageEmitter = require('./main/postmessage-events');
 
 class WebCaptureClient extends PostMessageEmitter {
-  consructor(canvas, setup, teardown, render, config) {
+  constructor(canvas, setup, teardown, render, config) {
+    super();
+
     if (window.top === window) {
       return;
     }
+
     this.canvas = canvas;
     this.setup = setup;
     this.teardown = teardown;
@@ -34,7 +37,7 @@ class WebCaptureClient extends PostMessageEmitter {
     this.sendMessage('ready');
   }
 
-  static sendMessage(name, message) {
+  sendMessage(name, message) {
     window.top.postMessage({
       webcapture: { name, message },
     }, '*');

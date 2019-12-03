@@ -3,7 +3,7 @@ const EventEmitter = require('events');
 class PostMessageEmitter extends EventEmitter {
   constructor() {
     super();
-    window.addEventListener('message', this.onmessage, false);
+    window.addEventListener('message', this.onmessage.bind(this), false);
   }
 
   onmessage(event) {
