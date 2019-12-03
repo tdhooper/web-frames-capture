@@ -28,7 +28,7 @@ class WebCaptureClient extends PostMessageEmitter {
   }
 
   sendImageData() {
-    this.canvas.toBlob((blob) => {
+    this.canvasToBlob().then((blob) => {
       this.sendMessage('rendered', blob);
     });
   }
@@ -41,6 +41,29 @@ class WebCaptureClient extends PostMessageEmitter {
     window.top.postMessage({
       webcapture: { name, message },
     }, '*');
+  }
+
+  canvasToBlob() {
+    // from https://github.com/mattdesl/canvas-sketch/blob/master/lib/save.js#L60
+    const dataURL = this.canvas.toDataURL();
+    return new Promise((resolve) => {
+      const splitIndex = dataURL.indexOf(',');
+      if (splitIndex === -1) {
+        resolve(new window.Blob());
+        return;
+      }
+      const base64 = dataURL.slice(splitIndex + 1);
+      const byteString = window.atob(base64);
+      const type = dataURL.slice(0, splitIndex);
+      const mimeMatch = /data:([^;]+)/.exec(type);
+      const mime = (mimeMatch ? mimeMatch[1] : '') || undefined;
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      resolve(new window.Blob([ ab ], { type: mime }));
+    });
   }
 }
 
