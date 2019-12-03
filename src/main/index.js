@@ -1,7 +1,8 @@
 const saveName = require('./save-name');
 const CaptureCounter = require('./capture-counter');
 const { Controller } = require('./controller');
-const WSRouter = require('./wsrouter');
+const WebSocketEmitter = require('./websocket-events');
+const PostMessageEmitter = require('./postmessage-events');
 
 const params = new URLSearchParams(window.location.search);
 const url = params.get('url');
@@ -13,14 +14,14 @@ ws.onopen = () => {
   iframe.setAttribute('src', url);
 };
 
-const wsRouter = new WSRouter();
+const wsevents = new WebSocketEmitter();
 
-wsRouter.on('close', () => {
+wsevents.on('close', () => {
   window.close();
 });
 
 ws.onmessage = (message) => {
-  wsRouter.onmessage(message.data);
+  wsevents.onmessage(message.data);
 };
 
 window.addEventListener('beforeunload', (event) => {
@@ -61,28 +62,13 @@ const upload = (blob, name) => {
   return f.then(response => response.text());
 };
 
-const receiveMessage = (event) => {
-  if (typeof event.data !== 'object') {
-    return;
-  }
-  if ( ! event.data.hasOwnProperty('webcapture')) {
-    return;
-  }
-  const { name, message } = event.data.webcapture;
-  switch (name) {
-    case 'config':
-      setConfig(message);
-      break;
-    case 'ready':
-      counter.ready();
-      break;
-    case 'rendered':
-      upload(message, saveName(config, counter))
-        .then(counter.rendered.bind(counter));
-      break;
-    default:
-      break;
-  }
-};
+const pmevents = new PostMessageEmitter();
 
-window.addEventListener('message', receiveMessage, false);
+pmevents.on('config', setConfig);
+
+pmevents.on('ready', counter.ready);
+
+pmevents.on('rendered', (message) => {
+  upload(message, saveName(config, counter))
+    .then(counter.rendered.bind(counter));
+});

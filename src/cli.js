@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const open = require('open');
 const browserify = require('browserify');
 const cliProgress = require('cli-progress');
-const WSRouter = require('./main/wsrouter');
+const WebSocketEmitter = require('./main/websocket-events');
 
 const url = process.argv[2];
 let saveLocation = process.argv[3];
@@ -30,19 +30,19 @@ const progress = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classi
 
 const wss = new WebSocket.Server({ port: 8080 });
 wss.on('connection', (ws) => {
-  const wsRouter = new WSRouter();
+  const wsevents = new WebSocketEmitter();
 
-  wsRouter.on('start', (config) => {
+  wsevents.on('start', (config) => {
     progress.start(config.fps * config.seconds, 0);
   });
 
-  wsRouter.on('done', () => {
+  wsevents.on('done', () => {
     progress.stop();
     ws.send(JSON.stringify({ type: 'close' }));
     process.exit();
   });
 
-  wsRouter.on('exit', () => {
+  wsevents.on('exit', () => {
     progress.stop();
     process.exit();
   });
@@ -53,7 +53,7 @@ wss.on('connection', (ws) => {
     process.exit();
   });
 
-  ws.on('message', wsRouter.onmessage.bind(wsRouter));
+  ws.on('message', wsevents.onmessage.bind(wsevents));
 });
 
 const router = Router();

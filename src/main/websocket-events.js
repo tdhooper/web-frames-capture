@@ -1,11 +1,11 @@
 const EventEmitter = require('events');
 
-class WSRouter extends EventEmitter {
+class WebSocketEmitter extends EventEmitter {
   onmessage(message) {
     let data;
     try {
       data = JSON.parse(message);
-    } catch(error) {
+    } catch (error) {
       return;
     }
     if (data.type !== undefined) {
@@ -14,4 +14,4 @@ class WSRouter extends EventEmitter {
   }
 }
 
-module.exports = WSRouter;
+module.exports = WebSocketEmitter;

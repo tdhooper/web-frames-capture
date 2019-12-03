@@ -1,5 +1,6 @@
+const PostMessageEmitter = require('./main/postmessage-events');
 
-class WebCaptureClient {
+class WebCaptureClient extends PostMessageEmitter {
   consructor(canvas, setup, teardown, render, config) {
     if (window.top === window) {
       return;
@@ -8,7 +9,18 @@ class WebCaptureClient {
     this.setup = setup;
     this.teardown = teardown;
     this.render = render;
-    window.addEventListener('message', this.receiveMessage.bind(this), false);
+
+    this.on('setup', (message) => {
+      this.setup(message, this.ready.bind(this));
+    });
+    this.on('teardown', this.teardown);
+    this.on('preview', (message) => {
+      this.render(message[0], message[1]);
+    });
+    this.on('capture', (message) => {
+      this.render(message[0], message[1], this.sendImageData.bind(this));
+    });
+
     this.sendMessage('config', config);
   }
 
@@ -26,32 +38,6 @@ class WebCaptureClient {
     window.top.postMessage({
       webcapture: { name, message },
     }, '*');
-  }
-
-  receiveMessage(event) {
-    if (typeof event.data != 'object') {
-      return;
-    }
-    if ( ! event.data.hasOwnProperty('webcapture')) {
-      return;
-    }
-    const { name, message } = event.data.webcapture;
-    switch (name) {
-      case 'setup':
-        this.setup(message, this.ready.bind(this));
-        break;
-      case 'teardown':
-        this.teardown();
-        break;
-      case 'preview':
-        this.render(message[0], message[1]);
-        break;
-      case 'capture':
-        this.render(message[0], message[1], this.sendImageData.bind(this));
-        break;
-      default:
-        break;
-    }
   }
 }
 

@@ -7,6 +7,7 @@ const PreviewCounter = require('../preview-counter');
 const { GUIController } = require('../controller');
 const configGui = require('./config-gui');
 const saveName = require('../save-name');
+const PostMessageEmitter = require('../postmessage-events');
 
 const urlInput = document.getElementById('url-input');
 const params = new URLSearchParams(window.location.search);
@@ -24,29 +25,14 @@ const captureCounter = new CaptureCounter();
 new GUIController(iframe, configGui.config, 'preview', previewCounter);
 new GUIController(iframe, configGui.config, 'capture', captureCounter);
 
-const receiveMessage = (event) => {
-  if (typeof event.data !== 'object') {
-    return;
-  }
-  if ( ! event.data.hasOwnProperty('webcapture')) {
-    return;
-  }
-  const { name, message } = event.data.webcapture;
-  switch (name) {
-    case 'config':
-      configGui.setConfig(message);
-      break;
-    case 'ready':
-      captureCounter.ready();
-      previewCounter.ready();
-      break;
-    case 'rendered':
-      saveAs(message, saveName(configGui.config, captureCounter));
-      captureCounter.rendered();
-      break;
-    default:
-      break;
-  }
-};
+const pmevents = new PostMessageEmitter();
 
-window.addEventListener('message', receiveMessage, false);
+pmevents.on('config', configGui.setConfig);
+
+pmevents.on('ready', captureCounter.ready);
+pmevents.on('ready', previewCounter.ready);
+
+pmevents.on('rendered', (message) => {
+  saveAs(message, saveName(configGui.config, captureCounter));
+  captureCounter.rendered();
+});
