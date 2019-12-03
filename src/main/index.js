@@ -1,6 +1,3 @@
-/* eslint no-param-reassign: ["error", { "props": false }] */
-/* eslint space-unary-ops: [2, { "overrides": {"!": true} }] */
-
 const saveName = require('./save-name');
 const CaptureCounter = require('./capture-counter');
 const { Controller } = require('./controller');

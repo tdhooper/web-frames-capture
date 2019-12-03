@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-/* eslint no-param-reassign: ["error", { "props": false }] */
-/* eslint space-unary-ops: [2, { "overrides": {"!": true} }] */
 
 const fs = require('fs');
 const path = require('path');
@@ -14,7 +12,7 @@ const bodyParser = require('body-parser');
 const open = require('open');
 const browserify = require('browserify');
 const cliProgress = require('cli-progress');
-const WSRouter = require('./wsrouter');
+const WSRouter = require('./main/wsrouter');
 
 const url = process.argv[2];
 let saveLocation = process.argv[3];
@@ -40,7 +38,7 @@ wss.on('connection', (ws) => {
 
   wsRouter.on('done', () => {
     progress.stop();
-    ws.send(JSON.stringify({type: 'close'}));
+    ws.send(JSON.stringify({ type: 'close' }));
     process.exit();
   });
 
@@ -50,7 +48,7 @@ wss.on('connection', (ws) => {
   });
 
   process.on('SIGINT', () => {
-    ws.send(JSON.stringify({type: 'close'}));
+    ws.send(JSON.stringify({ type: 'close' }));
     console.log(''); // exit on a new line
     process.exit();
   });
