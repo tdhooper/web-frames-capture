@@ -5,7 +5,8 @@
   "main": "src/client.js",
   "scripts": {
     "cli": "src/cli.js",
-    "build": "./build.js"
+    "build": "./build.js",
+    "test": "mocha **/*.spec.js"
   },
   "author": "Thomas Hooper",
   "license": "MIT",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "file-saver": "^2.0.2",
-    "fs-extra": "^8.1.0"
+    "fs-extra": "^8.1.0",
+    "mocha": "^6.2.2"
   }
 }
