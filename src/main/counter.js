@@ -22,6 +22,9 @@ class Counter {
   }
 
   next() {
+    if (this.done()) {
+      return { done: true };
+    }
     if (this.quads && this.quad < 3) {
       if ( ! this.first) {
         this.quad += 1;

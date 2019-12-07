@@ -17,6 +17,7 @@ describe('Counter', () => {
       done = result.done;
     }
     assert.equal(values.length, 0);
+    assert.deepStrictEqual(counter.next(), { done: true });
   });
 
   it('should iterate through all frames and quads', () => {
@@ -38,6 +39,7 @@ describe('Counter', () => {
       done = result.done;
     }
     assert.equal(values.length, 0);
+    assert.deepStrictEqual(counter.next(), { done: true });
   });
 
   it('should iterate from start frame', () => {
@@ -53,6 +55,7 @@ describe('Counter', () => {
       done = result.done;
     }
     assert.equal(values.length, 0);
+    assert.deepStrictEqual(counter.next(), { done: true });
   });
 
   it('should iterate from start frame including quads', () => {
@@ -70,5 +73,6 @@ describe('Counter', () => {
       done = result.done;
     }
     assert.equal(values.length, 0);
+    assert.deepStrictEqual(counter.next(), { done: true });
   });
 });
