@@ -46,4 +46,19 @@ describe('Capture stream', () => {
       done();
     });
   });
+
+  it('should stop for errors', (done) => {
+    const counter = new Counter(4, 1);
+    const capture = () => new Promise((resolve, reject) => {
+      reject(new Error('some_error'));
+    });
+    const captureStream = createCaptureStream(capture, () => counter.next());
+    captureStream.on('error', (error) => {
+      assert.equal(error.message, 'some_error');
+    });
+    captureStream.on('end', () => {
+      done();
+    });
+    captureStream.on('data', () => {});
+  });
 });

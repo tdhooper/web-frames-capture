@@ -13,7 +13,9 @@ const createCaptureStream = (capture, next) => new Readable({
       .then((blob) => {
         this.push({ frameIndex, quad, blob });
       })
-      .catch(this.destroy);
+      .catch((error) => {
+        this.destroy(error);
+      });
   },
 });
 
