@@ -431,7 +431,8 @@ const capture = startCapture(config, client, save)
 capture.then(() => {
   // send cli exit signal
 })
-capture.cancel();
+// on stop button pressed
+// capture.cancel();
 
 
 

@@ -4,8 +4,8 @@ const createCaptureStream = (capture, next) => new Readable({
   objectMode: true,
   autoDestroy: true,
   read() {
-    const { done, value } = next();
-    if (done) {
+    const { value } = next();
+    if (value === undefined) {
       this.push(null);
       return;
     }

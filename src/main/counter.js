@@ -1,7 +1,7 @@
 
 class Counter {
   constructor(fps, duration, startFrame, quads) {
-    this.quads = quads;
+    this.quads = quads || false;
     this.frameDuration = 1 / fps;
     this.duration = duration;
     this.totalFrames = Math.floor(fps * duration);
