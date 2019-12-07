@@ -7,14 +7,13 @@ const pad = (number, length) => {
   return str;
 };
 
-const saveName = (config, counter) => {
-  const { totalFrames } = counter;
-  const digits = totalFrames.toString().length;
-  let frameString = pad(counter.frame, digits);
-  if (counter.quads) {
-    frameString += `_${counter.quad}`;
+const saveName = (prefix, totalFrames, frameIndex, quads, quad) => {
+  const digits = (totalFrames - 1).toString().length;
+  let frameString = pad(frameIndex, digits);
+  if (quads) {
+    frameString += `_${quad}`;
   }
-  const filename = `${config.prefix}${frameString}.png`;
+  const filename = `${prefix}${frameString}.png`;
   return filename;
 };
 
