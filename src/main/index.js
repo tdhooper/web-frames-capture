@@ -1,56 +1,9 @@
-const saveName = require('./save-name');
-const CaptureCounter = require('./capture-counter');
-const { Controller } = require('./controller');
+const initClient = require('./rpc-client');
+const startCapture = require('./capture');
 const WebSocketEmitter = require('./websocket-events');
-const PostMessageEmitter = require('./postmessage-events');
 
 const params = new URLSearchParams(window.location.search);
 const url = params.get('url');
-const iframe = document.createElement('iframe');
-document.body.appendChild(iframe);
-
-const ws = new WebSocket('ws://localhost:8080');
-ws.onopen = () => {
-  iframe.setAttribute('src', url);
-};
-
-const wsevents = new WebSocketEmitter();
-
-wsevents.on('close', () => {
-  window.close();
-});
-
-ws.onmessage = (message) => {
-  wsevents.onmessage(message.data);
-};
-
-window.addEventListener('beforeunload', (event) => {
-  ws.send(JSON.stringify({
-    type: 'exit',
-  }));
-});
-
-const config = {};
-const counter = new CaptureCounter();
-const controller = new Controller(iframe, config, 'capture', counter);
-
-controller.on('end', () => {
-  ws.send(JSON.stringify({
-    type: 'done',
-  }));
-});
-
-const setConfig = (newConfig) => {
-  if (typeof newConfig !== 'object') {
-    return;
-  }
-  Object.assign(config, newConfig);
-  controller.start();
-  ws.send(JSON.stringify({
-    type: 'start',
-    data: config,
-  }));
-};
 
 const upload = (blob, name) => {
   const form = new FormData();
@@ -62,13 +15,39 @@ const upload = (blob, name) => {
   return f.then(response => response.text());
 };
 
-const pmevents = new PostMessageEmitter();
+const ws = new WebSocket('ws://localhost:8080');
+ws.onopen = () => {
+  initClient(url).then((client) => {
+    client.config().then((config) => {
+      const capture = startCapture(config, client, upload);
+      capture.on('finished', () => {
+        ws.send(JSON.stringify({
+          type: 'done',
+        }));
+      });
+      capture.on('ready', () => {
+        ws.send(JSON.stringify({
+          type: 'start',
+          data: config,
+        }));
+      });
+      // on error close (or report error?)
+    });
+  });
 
-pmevents.on('config', setConfig);
+  const wsevents = new WebSocketEmitter();
 
-pmevents.on('ready', () => counter.ready());
+  wsevents.on('close', () => {
+    window.close();
+  });
 
-pmevents.on('rendered', (message) => {
-  upload(message, saveName(config, counter))
-    .then(counter.rendered.bind(counter));
-});
+  ws.onmessage = (message) => {
+    wsevents.onmessage(message.data);
+  };
+
+  window.addEventListener('beforeunload', () => {
+    ws.send(JSON.stringify({
+      type: 'exit',
+    }));
+  });
+};

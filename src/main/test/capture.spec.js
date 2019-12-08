@@ -44,7 +44,7 @@ describe('Start capture', () => {
       width: 640,
       height: 360,
       fps: 2,
-      duration: 1,
+      seconds: 1,
       prefix: 'prefix-',
     };
     captureReady = sinon.fake();
@@ -156,10 +156,6 @@ describe('Start capture', () => {
         assert(client.teardown.notCalled);
       });
 
-      it('does not emit the finished event', () => {
-        assert(captureFinished.notCalled);
-      });
-
       describe('when last capture is complete', () => {
         beforeEach((done) => {
           clientCaptureResolve();
@@ -175,8 +171,18 @@ describe('Start capture', () => {
           assert(client.teardown.calledOnce);
         });
 
-        it('emits the finished event', () => {
-          assert(captureFinished.calledOnce);
+        it('does not emit the finished event', () => {
+          assert(captureFinished.notCalled);
+        });
+
+        describe('when last save is complete', () => {
+          beforeEach(() => {
+            mockPromises.tick();
+          });
+
+          it('emits the finished event', () => {
+            assert(captureFinished.calledOnce);
+          });
         });
       });
     });

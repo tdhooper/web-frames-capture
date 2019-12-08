@@ -460,19 +460,33 @@ preview.then(() => {
 // STANDALONE
 
 // iframe
-client = PostingClient(funcs);
+enableCapture(
+  canvas,
+  captureSetup,
+  captureTeardown,
+  captureRender,
+  captureConfig
+);
+// HandlerClient
 
 // page
-client = RecievingClient(url);
+client = ControllerClient(url);
 
 
 // CLI
 
 // iframe
-client = PostingClient(funcs);
+enableCapture(
+  canvas,
+  captureSetup,
+  captureTeardown,
+  captureRender,
+  captureConfig
+);
+// HandlerClient
 
 // page
-client = RecievingClient(url);
+client = ControllerClient(url);
 
 
 // SHADERTOY
@@ -480,3 +494,11 @@ client = RecievingClient(url);
 // extension
 
 client = Client(funcs);
+
+
+
+
+
+const postmessageHandler = (namespace, method) => {
+
+}

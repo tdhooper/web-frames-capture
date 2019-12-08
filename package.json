@@ -2,7 +2,7 @@
   "name": "web-frames-capture",
   "version": "1.1.0",
   "description": "Capture canvas animations as a PNG sequence",
-  "main": "src/client.js",
+  "main": "src/enable-capture.js",
   "scripts": {
     "cli": "src/cli.js",
     "build": "./build.js",
