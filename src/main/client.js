@@ -1,46 +1,37 @@
-const PostMessageEmitter = require('./main/postmessage-events');
 
-class WebCaptureClient extends PostMessageEmitter {
+class Client {
   constructor(canvas, setup, teardown, render, config) {
-    super();
-
-    if (window.top === window) {
-      return;
-    }
-
     this.canvas = canvas;
-    this.setup = setup;
-    this.teardown = teardown;
-    this.render = render;
-
-    this.on('setup', (message) => {
-      this.setup(message, this.ready.bind(this));
-    });
-    this.on('teardown', this.teardown);
-    this.on('preview', (message) => {
-      this.render(message[0], message[1]);
-    });
-    this.on('capture', (message) => {
-      this.render(message[0], message[1], this.sendImageData.bind(this));
-    });
-
-    this.sendMessage('config', config);
+    this._setup = setup;
+    this._teardown = teardown;
+    this._render = render;
+    this._config = config;
   }
 
-  sendImageData() {
-    this.canvasToBlob().then((blob) => {
-      this.sendMessage('rendered', blob);
+  config() {
+    return this._config;
+  }
+
+  setup(width, height) {
+    return new Promise((resolve) => {
+      this._setup(width, height, resolve);
     });
   }
 
-  ready() {
-    this.sendMessage('ready');
+  teardown() {
+    this._teardown();
   }
 
-  sendMessage(name, message) {
-    window.top.postMessage({
-      webcapture: { name, message },
-    }, '*');
+  capture(milliseconds, quad) {
+    return new Promise((resolve) => {
+      this._render(milliseconds, quad, () => {
+        this.canvasToBlob().then(resolve);
+      });
+    });
+  }
+
+  preview(milliseconds) {
+    this._render(milliseconds, 0, () => {});
   }
 
   canvasToBlob() {
@@ -67,4 +58,4 @@ class WebCaptureClient extends PostMessageEmitter {
   }
 }
 
-module.exports = WebCaptureClient;
+module.exports = Client;

@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/tdhooper/web-frames-capture#readme",
   "dependencies": {
+    "@jurca/post-message-rpc": "^1.0.1",
     "body-parser": "^1.19.0",
     "browserify": "^16.5.0",
     "cli-progress": "^3.4.0",

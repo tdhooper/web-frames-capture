@@ -443,3 +443,40 @@ preview.then(() => {
   // show stop button
   // preview.cancel();
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// STANDALONE
+
+// iframe
+client = PostingClient(funcs);
+
+// page
+client = RecievingClient(url);
+
+
+// CLI
+
+// iframe
+client = PostingClient(funcs);
+
+// page
+client = RecievingClient(url);
+
+
+// SHADERTOY
+
+// extension
+
+client = Client(funcs);
