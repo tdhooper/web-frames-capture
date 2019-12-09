@@ -4,9 +4,9 @@ const browserify = require('browserify');
 const fs = require('fs-extra');
 const path = require('path');
 
-const target = 'standalone';
+const target = 'build/standalone';
 fs.removeSync(target);
-fs.mkdirSync(target);
+fs.mkdirSync(target, { recursive: true });
 fs.copySync('src/standalone/css', path.join(target, 'css'));
 fs.copySync('src/standalone/index.html', path.join(target, 'index.html'));
 
