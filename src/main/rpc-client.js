@@ -1,8 +1,10 @@
 const { createClient } = require('@jurca/post-message-rpc');
 
-const initClient = async (url) => {
-  const iframe = document.createElement('iframe');
-  document.body.appendChild(iframe);
+const initClient = async (url, iframe) => {
+  if ( ! iframe) {
+    iframe = document.createElement('iframe');
+    document.body.appendChild(iframe);
+  }
   return new Promise((resolve) => {
     iframe.addEventListener('load', () => {
       const client = createClient(

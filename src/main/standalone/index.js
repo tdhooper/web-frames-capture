@@ -1,13 +1,7 @@
-/* eslint no-param-reassign: ["error", { "props": false }] */
-/* eslint space-unary-ops: [2, { "overrides": {"!": true} }] */
-
 const { saveAs } = require('file-saver');
-const CaptureCounter = require('../capture-counter');
-const PreviewCounter = require('../preview-counter');
-const { GUIController } = require('../controller');
 const configGui = require('./config-gui');
-const saveName = require('../save-name');
-const PostMessageEmitter = require('../postmessage-events');
+const initClient = require('../rpc-client');
+const startCapture = require('../capture');
 
 const urlInput = document.getElementById('url-input');
 const params = new URLSearchParams(window.location.search);
@@ -15,24 +9,40 @@ const url = params.get('url');
 urlInput.value = url;
 
 const iframe = document.getElementById('target-iframe');
-if (url) {
-  iframe.setAttribute('src', urlInput.value);
-}
 
-const previewCounter = new PreviewCounter();
-const captureCounter = new CaptureCounter();
+const save = (blob, name) => new Promise((resolve) => {
+  saveAs(blob, name);
+  resolve();
+});
 
-new GUIController(iframe, configGui.config, 'preview', previewCounter);
-new GUIController(iframe, configGui.config, 'capture', captureCounter);
+initClient(url, iframe).then((client) => {
+  let capture;
+  const startButton = document.getElementById('capture');
+  const stopButton = document.getElementById('stop');
 
-const pmevents = new PostMessageEmitter();
+  const start = () => {
+    startButton.setAttribute('disabled', '');
+    capture = startCapture(configGui.config, client, save);
+    capture.on('ready', () => {
+      stopButton.removeAttribute('disabled');
+    });
+    capture.on('finished', () => {
+      startButton.removeAttribute('disabled');
+      stopButton.setAttribute('disabled', '');
+    });
+  };
 
-pmevents.on('config', configGui.setConfig);
+  const stop = () => {
+    capture.cancel();
+    stopButton.setAttribute('disabled', '');
+    startButton.removeAttribute('disabled');
+  };
 
-pmevents.on('ready', captureCounter.ready);
-pmevents.on('ready', previewCounter.ready);
+  startButton.addEventListener('click', start);
+  stopButton.addEventListener('click', stop);
 
-pmevents.on('rendered', (message) => {
-  saveAs(message, saveName(configGui.config, captureCounter));
-  captureCounter.rendered();
+  client.config().then((config) => {
+    configGui.setConfig(config);
+    startButton.removeAttribute('disabled');
+  });
 });

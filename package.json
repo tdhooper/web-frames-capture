@@ -23,6 +23,7 @@
     "body-parser": "^1.19.0",
     "browserify": "^16.5.0",
     "cli-progress": "^3.4.0",
+    "file-saver": "^2.0.2",
     "finalhandler": "^1.1.2",
     "multiparty": "^4.2.1",
     "open": "^7.0.0",
@@ -34,7 +35,6 @@
     "web-frames-capture": "src/cli.js"
   },
   "devDependencies": {
-    "file-saver": "^2.0.2",
     "fs-extra": "^8.1.0",
     "mocha": "^6.2.2",
     "mock-promises": "^0.8.2",
