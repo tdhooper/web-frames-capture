@@ -31,7 +31,9 @@ class Client {
   }
 
   preview(milliseconds) {
-    this._render(milliseconds, 0, () => {});
+    return new Promise((resolve) => {
+      this._render(milliseconds, 0, () => resolve());
+    });
   }
 
   canvasToBlob() {

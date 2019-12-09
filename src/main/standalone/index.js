@@ -2,6 +2,7 @@ const { saveAs } = require('file-saver');
 const configGui = require('./config-gui');
 const initClient = require('../rpc-client');
 const startCapture = require('../capture');
+const startPreview = require('../preview');
 
 const urlInput = document.getElementById('url-input');
 const params = new URLSearchParams(window.location.search);
@@ -17,32 +18,49 @@ const save = (blob, name) => new Promise((resolve) => {
 
 initClient(url, iframe).then((client) => {
   let capture;
-  const startButton = document.getElementById('capture');
+  let preview;
+  const captureButton = document.getElementById('capture');
+  const previewButton = document.getElementById('preview');
   const stopButton = document.getElementById('stop');
 
-  const start = () => {
-    startButton.setAttribute('disabled', '');
+  const captureHandler = () => {
+    captureButton.setAttribute('disabled', '');
+    previewButton.setAttribute('disabled', '');
     capture = startCapture(configGui.config, client, save);
     capture.on('ready', () => {
       stopButton.removeAttribute('disabled');
     });
     capture.on('finished', () => {
-      startButton.removeAttribute('disabled');
+      captureButton.removeAttribute('disabled');
+      previewButton.removeAttribute('disabled');
       stopButton.setAttribute('disabled', '');
     });
   };
 
-  const stop = () => {
-    capture.cancel();
-    stopButton.setAttribute('disabled', '');
-    startButton.removeAttribute('disabled');
+  const previewHandler = () => {
+    captureButton.setAttribute('disabled', '');
+    previewButton.setAttribute('disabled', '');
+    preview = startPreview(configGui.config, client);
+    preview.on('ready', () => {
+      stopButton.removeAttribute('disabled');
+    });
   };
 
-  startButton.addEventListener('click', start);
-  stopButton.addEventListener('click', stop);
+  const stopHandler = () => {
+    capture && capture.cancel();
+    preview && preview.cancel();
+    stopButton.setAttribute('disabled', '');
+    captureButton.removeAttribute('disabled');
+    previewButton.removeAttribute('disabled');
+  };
+
+  captureButton.addEventListener('click', captureHandler);
+  previewButton.addEventListener('click', previewHandler);
+  stopButton.addEventListener('click', stopHandler);
 
   client.config().then((config) => {
     configGui.setConfig(config);
-    startButton.removeAttribute('disabled');
+    captureButton.removeAttribute('disabled');
+    previewButton.removeAttribute('disabled');
   });
 });
