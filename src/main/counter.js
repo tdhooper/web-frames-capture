@@ -1,15 +1,15 @@
 
 class Counter {
-  constructor(fps, duration, startFrame, quads, loop) {
-    this.quads = quads || false;
+  constructor(fps, duration, { startFrame = 0, quads = false, loop = false } = {}) {
     this.frameDuration = 1 / fps;
     this.duration = duration;
+    this.quads = quads;
+    this.loop = loop;
     this.totalFrames = Math.floor(fps * duration);
-    this.frameIndex = startFrame || 0;
+    this.frameIndex = startFrame;
     this.milliseconds = 0;
     this.quad = 0;
     this.first = true;
-    this.loop = loop;
   }
 
   done() {

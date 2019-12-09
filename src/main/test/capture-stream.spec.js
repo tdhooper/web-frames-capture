@@ -24,7 +24,7 @@ describe('Capture stream', () => {
   });
 
   it('should capture for every frame and quad', (done) => {
-    const counter = new Counter(2, 1, 0, true);
+    const counter = new Counter(2, 1, { quads: true });
     const capture = milliseconds => new Promise((resolve) => {
       resolve(`some_blob_${milliseconds}`);
     });

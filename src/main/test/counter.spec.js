@@ -21,7 +21,7 @@ describe('Counter', () => {
   });
 
   it('should iterate through all frames endlessly when looping is enabled', () => {
-    const counter = new Counter(4, 1, 0, false, true);
+    const counter = new Counter(4, 1, { loop: true });
     const values = [
       { frameIndex: 0, milliseconds: 0, quad: 0 },
       { frameIndex: 1, milliseconds: 250, quad: 0 },
@@ -38,7 +38,7 @@ describe('Counter', () => {
   });
 
   it('should iterate through all frames and quads', () => {
-    const counter = new Counter(2, 1, 0, true);
+    const counter = new Counter(2, 1, { quads: true });
     const values = [
       { frameIndex: 0, milliseconds: 0, quad: 0 },
       { frameIndex: 0, milliseconds: 0, quad: 1 },
@@ -60,7 +60,7 @@ describe('Counter', () => {
   });
 
   it('should iterate from start frame', () => {
-    const counter = new Counter(4, 1, 2);
+    const counter = new Counter(4, 1, { startFrame: 2 });
     const values = [
       { frameIndex: 2, milliseconds: 500, quad: 0 },
       { frameIndex: 3, milliseconds: 750, quad: 0 },
@@ -76,7 +76,7 @@ describe('Counter', () => {
   });
 
   it('should iterate from start frame including quads', () => {
-    const counter = new Counter(2, 1, 1, true);
+    const counter = new Counter(2, 1, { startFrame: 1, quads: true });
     const values = [
       { frameIndex: 1, milliseconds: 500, quad: 0 },
       { frameIndex: 1, milliseconds: 500, quad: 1 },

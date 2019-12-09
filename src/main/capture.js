@@ -20,7 +20,7 @@ const startCapture = (config, client, save) => {
     .then(() => {
       emitter.emit('ready');
 
-      const counter = new Counter(fps, seconds, startFrame, quads);
+      const counter = new Counter(fps, seconds, { startFrame, quads });
       const captureStream = createCaptureStream(
         client.capture.bind(client),
         counter.next.bind(counter),

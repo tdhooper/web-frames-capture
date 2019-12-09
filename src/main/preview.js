@@ -16,7 +16,7 @@ const startPreview = (config, client) => {
     .then(() => {
       emitter.emit('ready');
 
-      const counter = new Counter(fps, seconds, startFrame, false, true);
+      const counter = new Counter(fps, seconds, { startFrame, loop: true });
 
       let timeout;
       let lastComplete = true;
