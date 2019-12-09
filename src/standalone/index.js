@@ -1,8 +1,8 @@
 const { saveAs } = require('file-saver');
 const configGui = require('./config-gui');
-const initClient = require('../rpc-client');
-const startCapture = require('../capture');
-const startPreview = require('../preview');
+const { initClient } = require('../client/rpc');
+const startCapture = require('../main/capture');
+const startPreview = require('../main/preview');
 
 const urlInput = document.getElementById('url-input');
 const params = new URLSearchParams(window.location.search);

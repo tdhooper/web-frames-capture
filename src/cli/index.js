@@ -1,5 +1,5 @@
-const initClient = require('./rpc-client');
-const startCapture = require('./capture');
+const { initClient } = require('../client/rpc');
+const startCapture = require('../main/capture');
 const WebSocketEmitter = require('./websocket-events');
 
 const params = new URLSearchParams(window.location.search);

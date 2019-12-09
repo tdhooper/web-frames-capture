@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const open = require('open');
 const browserify = require('browserify');
 const cliProgress = require('cli-progress');
-const WebSocketEmitter = require('./main/websocket-events');
+const WebSocketEmitter = require('./cli/websocket-events');
 
 const url = process.argv[2];
 let saveLocation = process.argv[3];
@@ -61,14 +61,14 @@ const router = Router();
 router.get('/', (request, response) => {
   html({
     title: 'Web Frames Capture',
-    entry: 'cli-index.js',
+    entry: 'index.js',
   }).pipe(response);
 });
 
-router.get('/cli-index.js', (request, response) => {
+router.get('/index.js', (request, response) => {
   const scriptDir = path.dirname(require.main.filename);
   browserify()
-    .add(path.join(scriptDir, 'main/cli-index.js'))
+    .add(path.join(scriptDir, 'cli/index.js'))
     .bundle()
     .pipe(response);
 });

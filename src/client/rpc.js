@@ -1,4 +1,10 @@
-const { createClient } = require('@jurca/post-message-rpc');
+const { createServer, createClient } = require('@jurca/post-message-rpc');
+const Client = require('./client');
+
+const initServer = (canvas, setup, teardown, render, config) => {
+  const client = new Client(canvas, setup, teardown, render, config);
+  createServer('web-frames-capture', [], client);
+};
 
 const initClient = async (url, iframe) => {
   if ( ! iframe) {
@@ -26,4 +32,7 @@ const initClient = async (url, iframe) => {
   });
 };
 
-module.exports = initClient;
+module.exports = {
+  initClient,
+  initServer,
+};

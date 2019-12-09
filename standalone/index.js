@@ -6216,6 +6216,111 @@ function config (name) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],35:[function(require,module,exports){
+
+class Client {
+  constructor(canvas, setup, teardown, render, config) {
+    this.canvas = canvas;
+    this._setup = setup;
+    this._teardown = teardown;
+    this._render = render;
+    this._config = config;
+  }
+
+  config() {
+    return this._config;
+  }
+
+  setup(width, height) {
+    return new Promise((resolve) => {
+      this._setup(width, height, resolve);
+    });
+  }
+
+  teardown() {
+    this._teardown();
+  }
+
+  capture(milliseconds, quad) {
+    return new Promise((resolve) => {
+      this._render(milliseconds, quad, () => {
+        this.canvasToBlob().then(resolve);
+      });
+    });
+  }
+
+  preview(milliseconds) {
+    return new Promise((resolve) => {
+      this._render(milliseconds, 0, () => resolve());
+    });
+  }
+
+  canvasToBlob() {
+    // from https://github.com/mattdesl/canvas-sketch/blob/master/lib/save.js#L60
+    const dataURL = this.canvas.toDataURL();
+    return new Promise((resolve) => {
+      const splitIndex = dataURL.indexOf(',');
+      if (splitIndex === -1) {
+        resolve(new window.Blob());
+        return;
+      }
+      const base64 = dataURL.slice(splitIndex + 1);
+      const byteString = window.atob(base64);
+      const type = dataURL.slice(0, splitIndex);
+      const mimeMatch = /data:([^;]+)/.exec(type);
+      const mime = (mimeMatch ? mimeMatch[1] : '') || undefined;
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      resolve(new window.Blob([ ab ], { type: mime }));
+    });
+  }
+}
+
+module.exports = Client;
+
+},{}],36:[function(require,module,exports){
+const { createServer, createClient } = require('@jurca/post-message-rpc');
+const Client = require('./client');
+
+const initServer = (canvas, setup, teardown, render, config) => {
+  const client = new Client(canvas, setup, teardown, render, config);
+  createServer('web-frames-capture', [], client);
+};
+
+const initClient = async (url, iframe) => {
+  if ( ! iframe) {
+    iframe = document.createElement('iframe');
+    document.body.appendChild(iframe);
+  }
+  return new Promise((resolve) => {
+    iframe.addEventListener('load', () => {
+      const client = createClient(
+        iframe.contentWindow,
+        {
+          channel: 'web-frames-capture',
+        },
+        {
+          config: null,
+          setup: null,
+          teardown: null,
+          capture: null,
+          preview: null,
+        },
+      );
+      resolve(client);
+    });
+    iframe.setAttribute('src', url);
+  });
+};
+
+module.exports = {
+  initClient,
+  initServer,
+};
+
+},{"./client":35,"@jurca/post-message-rpc":3}],37:[function(require,module,exports){
 const { Readable } = require('stream');
 
 const createCaptureStream = (capture, next) => new Readable({
@@ -6240,7 +6345,7 @@ const createCaptureStream = (capture, next) => new Readable({
 
 module.exports = createCaptureStream;
 
-},{"stream":32}],36:[function(require,module,exports){
+},{"stream":32}],38:[function(require,module,exports){
 const EventEmitter = require('events');
 const Counter = require('./counter');
 const createCaptureStream = require('./capture-stream');
@@ -6263,7 +6368,7 @@ const startCapture = (config, client, save) => {
     .then(() => {
       emitter.emit('ready');
 
-      const counter = new Counter(fps, seconds, startFrame, quads);
+      const counter = new Counter(fps, seconds, { startFrame, quads });
       const captureStream = createCaptureStream(
         client.capture.bind(client),
         counter.next.bind(counter),
@@ -6297,19 +6402,19 @@ const startCapture = (config, client, save) => {
 
 module.exports = startCapture;
 
-},{"./capture-stream":35,"./counter":37,"./save-stream":41,"events":8}],37:[function(require,module,exports){
+},{"./capture-stream":37,"./counter":39,"./save-stream":42,"events":8}],39:[function(require,module,exports){
 
 class Counter {
-  constructor(fps, duration, startFrame, quads, loop) {
-    this.quads = quads || false;
+  constructor(fps, duration, { startFrame = 0, quads = false, loop = false } = {}) {
     this.frameDuration = 1 / fps;
     this.duration = duration;
+    this.quads = quads;
+    this.loop = loop;
     this.totalFrames = Math.floor(fps * duration);
-    this.frameIndex = startFrame || 0;
+    this.frameIndex = startFrame;
     this.milliseconds = 0;
     this.quad = 0;
     this.first = true;
-    this.loop = loop;
   }
 
   done() {
@@ -6357,7 +6462,7 @@ class Counter {
 
 module.exports = Counter;
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 const EventEmitter = require('events');
 const Counter = require('./counter');
 
@@ -6376,7 +6481,7 @@ const startPreview = (config, client) => {
     .then(() => {
       emitter.emit('ready');
 
-      const counter = new Counter(fps, seconds, startFrame, false, true);
+      const counter = new Counter(fps, seconds, { startFrame, loop: true });
 
       let timeout;
       let lastComplete = true;
@@ -6406,38 +6511,7 @@ const startPreview = (config, client) => {
 
 module.exports = startPreview;
 
-},{"./counter":37,"events":8}],39:[function(require,module,exports){
-const { createClient } = require('@jurca/post-message-rpc');
-
-const initClient = async (url, iframe) => {
-  if ( ! iframe) {
-    iframe = document.createElement('iframe');
-    document.body.appendChild(iframe);
-  }
-  return new Promise((resolve) => {
-    iframe.addEventListener('load', () => {
-      const client = createClient(
-        iframe.contentWindow,
-        {
-          channel: 'web-frames-capture',
-        },
-        {
-          config: null,
-          setup: null,
-          teardown: null,
-          capture: null,
-          preview: null,
-        },
-      );
-      resolve(client);
-    });
-    iframe.setAttribute('src', url);
-  });
-};
-
-module.exports = initClient;
-
-},{"@jurca/post-message-rpc":3}],40:[function(require,module,exports){
+},{"./counter":39,"events":8}],41:[function(require,module,exports){
 
 const pad = (number, length) => {
   let str = `${number}`;
@@ -6459,7 +6533,7 @@ const saveName = (prefix, totalFrames, frameIndex, quads, quad) => {
 
 module.exports = saveName;
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 const { Writable } = require('stream');
 const saveName = require('./save-name');
 
@@ -6480,7 +6554,7 @@ const createSaveStream = (save, prefix, totalFrames, quads) => new Writable({
 
 module.exports = createSaveStream;
 
-},{"./save-name":40,"stream":32}],42:[function(require,module,exports){
+},{"./save-name":41,"stream":32}],43:[function(require,module,exports){
 
 const inputs = document.querySelectorAll('.settings input');
 
@@ -6530,12 +6604,12 @@ module.exports = {
   config,
 };
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 const { saveAs } = require('file-saver');
 const configGui = require('./config-gui');
-const initClient = require('../rpc-client');
-const startCapture = require('../capture');
-const startPreview = require('../preview');
+const { initClient } = require('../client/rpc');
+const startCapture = require('../main/capture');
+const startPreview = require('../main/preview');
 
 const urlInput = document.getElementById('url-input');
 const params = new URLSearchParams(window.location.search);
@@ -6598,4 +6672,4 @@ initClient(url, iframe).then((client) => {
   });
 });
 
-},{"../capture":36,"../preview":38,"../rpc-client":39,"./config-gui":42,"file-saver":9}]},{},[43]);
+},{"../client/rpc":36,"../main/capture":38,"../main/preview":40,"./config-gui":43,"file-saver":9}]},{},[44]);

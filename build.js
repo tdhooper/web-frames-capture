@@ -7,11 +7,11 @@ const path = require('path');
 const target = 'standalone';
 fs.removeSync(target);
 fs.mkdirSync(target);
-fs.copySync('src/main/standalone/css', path.join(target, 'css'));
-fs.copySync('src/main/standalone/index.html', path.join(target, 'index.html'));
+fs.copySync('src/standalone/css', path.join(target, 'css'));
+fs.copySync('src/standalone/index.html', path.join(target, 'index.html'));
 
 const js = fs.createWriteStream(path.join(target, 'index.js'));
 browserify()
-  .add('src/main/standalone/index.js')
+  .add('src/standalone/index.js')
   .bundle()
   .pipe(js);
