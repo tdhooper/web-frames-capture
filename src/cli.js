@@ -61,14 +61,14 @@ const router = Router();
 router.get('/', (request, response) => {
   html({
     title: 'Web Frames Capture',
-    entry: 'index.js',
+    entry: 'cli-index.js',
   }).pipe(response);
 });
 
-router.get('/index.js', (request, response) => {
+router.get('/cli-index.js', (request, response) => {
   const scriptDir = path.dirname(require.main.filename);
   browserify()
-    .add(path.join(scriptDir, 'main/index.js'))
+    .add(path.join(scriptDir, 'main/cli-index.js'))
     .bundle()
     .pipe(response);
 });
