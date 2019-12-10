@@ -9,7 +9,7 @@ $ npm install --save web-frames-capture
 ````
 
 ````javascript
-const WebCaptureClient = require('web-frames-capture');
+const webFramesCapture = require('web-frames-capture');
 
 var captureSetup = function(config, done) {
     // Configure your scene with config.width and config.height,
@@ -38,7 +38,7 @@ var captureConfig = {
   quad: true // optional, render each frame 4 times, for splitting a screen into quads
 };
 
-var webCapture = new WebCaptureClient(
+webFramesCapture(
   canvas, // The canvas element you're drawing to
   captureSetup,
   captureTeardown,
@@ -48,4 +48,4 @@ var webCapture = new WebCaptureClient(
 
 ````
 
-2. [Open the UI](https://tdhooper.github.io/web-frames-capture/server/) and enter the url where your project is running
+2. [Open the UI](https://tdhooper.github.io/web-frames-capture/build/standalone) and enter the url where your project is running
