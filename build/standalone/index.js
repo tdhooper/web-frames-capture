@@ -99,15 +99,15 @@ function listen(channel, origins, messageListener) {
         if (!('handshake' in data) && !('data' in data)) {
             return;
         }
-        origin = origin == 'null' ? '*' : origin;
+        var messageOrigin = origin === 'null' ? '*' : origin;
         if ('data' in data) {
-            messageListener(data.data, source, origin);
+            messageListener(data.data, source, messageOrigin);
         }
         event.source.postMessage({
             channel: channel,
             messageId: data.messageId,
             received: true,
-        }, origin);
+        }, messageOrigin);
     });
 }
 exports.listen = listen;
