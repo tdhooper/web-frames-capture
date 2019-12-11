@@ -14,8 +14,6 @@ const startPreview = (config, client) => {
 
   client.setup(width, height)
     .then(() => {
-      emitter.emit('ready');
-
       const counter = new Counter(fps, seconds, { startFrame, loop: true });
 
       let timeout;
@@ -36,6 +34,19 @@ const startPreview = (config, client) => {
         clearTimeout(timeout);
         client.teardown();
       };
+
+      emitter.pause = () => {
+        clearTimeout(timeout);
+        timeout = undefined;
+      };
+
+      emitter.unpause = () => {
+        if (timeout === undefined) {
+          loop();
+        }
+      };
+
+      emitter.emit('ready');
     })
     .catch((error) => {
       emitter.emit('error', error);

@@ -6366,8 +6366,6 @@ const startCapture = (config, client, save) => {
 
   client.setup(width, height)
     .then(() => {
-      emitter.emit('ready');
-
       const counter = new Counter(fps, seconds, { startFrame, quads });
       const captureStream = createCaptureStream(
         client.capture.bind(client),
@@ -6378,6 +6376,7 @@ const startCapture = (config, client, save) => {
 
       captureStream.on('end', () => {
         client.teardown();
+        emitter.emit('captureFinished');
       });
 
       saveStream.on('finish', () => {
@@ -6392,6 +6391,8 @@ const startCapture = (config, client, save) => {
         captureStream.destroy();
         client.teardown();
       };
+
+      emitter.emit('ready');
     })
     .catch((error) => {
       emitter.emit('error', error);
@@ -6479,8 +6480,6 @@ const startPreview = (config, client) => {
 
   client.setup(width, height)
     .then(() => {
-      emitter.emit('ready');
-
       const counter = new Counter(fps, seconds, { startFrame, loop: true });
 
       let timeout;
@@ -6501,6 +6500,19 @@ const startPreview = (config, client) => {
         clearTimeout(timeout);
         client.teardown();
       };
+
+      emitter.pause = () => {
+        clearTimeout(timeout);
+        timeout = undefined;
+      };
+
+      emitter.unpause = () => {
+        if (timeout === undefined) {
+          loop();
+        }
+      };
+
+      emitter.emit('ready');
     })
     .catch((error) => {
       emitter.emit('error', error);

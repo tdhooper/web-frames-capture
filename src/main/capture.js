@@ -18,8 +18,6 @@ const startCapture = (config, client, save) => {
 
   client.setup(width, height)
     .then(() => {
-      emitter.emit('ready');
-
       const counter = new Counter(fps, seconds, { startFrame, quads });
       const captureStream = createCaptureStream(
         client.capture.bind(client),
@@ -30,6 +28,7 @@ const startCapture = (config, client, save) => {
 
       captureStream.on('end', () => {
         client.teardown();
+        emitter.emit('captureFinished');
       });
 
       saveStream.on('finish', () => {
@@ -44,6 +43,8 @@ const startCapture = (config, client, save) => {
         captureStream.destroy();
         client.teardown();
       };
+
+      emitter.emit('ready');
     })
     .catch((error) => {
       emitter.emit('error', error);
