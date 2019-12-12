@@ -39,7 +39,6 @@ wss.on('connection', (ws) => {
   wsevents.on('done', () => {
     progress.stop();
     ws.send(JSON.stringify({ type: 'close' }));
-    process.exit();
   });
 
   wsevents.on('exit', () => {
