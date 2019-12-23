@@ -73,6 +73,8 @@ router.get('/index.js', (request, response) => {
 });
 
 router.post('/save', (request, response) => {
+  response.setHeader('Access-Control-Allow-Origin', '*');
+
   const form = new multiparty.Form({
     autoFiles: true,
   });
@@ -97,6 +99,9 @@ const server = http.createServer((request, response) => {
 
 server.on('listening', () => {
   const { port } = server.address();
+  // open(`${url}?port=${port}`, {
+  //   background: true,
+  // });
   open(`http://localhost:${port}?url=${url}`, {
     background: true,
   });

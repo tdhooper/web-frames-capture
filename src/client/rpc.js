@@ -6,29 +6,30 @@ const initServer = (canvas, setup, teardown, render, config) => {
   createServer('web-frames-capture', [], client);
 };
 
-const initClient = async (url, iframe) => {
-  if ( ! iframe) {
-    iframe = document.createElement('iframe');
-    document.body.appendChild(iframe);
-  }
+const initClient = async (url) => {
   return new Promise((resolve) => {
-    iframe.addEventListener('load', () => {
-      const client = createClient(
-        iframe.contentWindow,
-        {
-          channel: 'web-frames-capture',
-        },
-        {
-          config: null,
-          setup: null,
-          teardown: null,
-          capture: null,
-          preview: null,
-        },
-      );
-      resolve(client);
+    const button = document.createElement('button');
+    button.textContent = 'Start';
+    document.body.appendChild(button);
+    button.addEventListener('click', () => {
+      const page = window.open(url);
+      setTimeout(() => {
+        const client = createClient(
+          page,
+          {
+            channel: 'web-frames-capture',
+          },
+          {
+            config: null,
+            setup: null,
+            teardown: null,
+            capture: null,
+            preview: null,
+          },
+        );
+        resolve(client);
+      }, 3000);
     });
-    iframe.setAttribute('src', url);
   });
 };
 
