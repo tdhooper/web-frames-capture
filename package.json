@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "fs-extra": "^8.1.0",
-    "mocha": "^6.2.2",
+    "mocha": "^7.1.2",
     "mock-promises": "^0.8.2",
     "sinon": "^7.5.0"
   }
