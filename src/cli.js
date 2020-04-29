@@ -97,7 +97,9 @@ const server = http.createServer((request, response) => {
 
 server.on('listening', () => {
   const { port } = server.address();
-  open(`http://localhost:${port}?url=${url}`, {
+  const address = `http://localhost:${port}?url=${url}`;
+  console.log(`Opening ${address}`)
+  open(address, {
     background: true,
   });
 });
