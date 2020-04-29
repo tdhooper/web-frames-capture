@@ -55,8 +55,6 @@ describe('Capture stream', () => {
     const captureStream = createCaptureStream(capture, () => counter.next());
     captureStream.on('error', (error) => {
       assert.equal(error.message, 'some_error');
-    });
-    captureStream.on('end', () => {
       done();
     });
     captureStream.on('data', () => {});
