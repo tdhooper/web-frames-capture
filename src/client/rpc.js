@@ -17,7 +17,7 @@ const initClient = async (url, iframe) => {
         iframe.contentWindow,
         {
           channel: 'web-frames-capture',
-          timeout: 30000,
+          timeout: 3000000,
         },
         {
           config: null,

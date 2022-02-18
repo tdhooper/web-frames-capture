@@ -33,7 +33,7 @@ wss.on('connection', (ws) => {
   const wsevents = new WebSocketEmitter();
 
   wsevents.on('start', (config) => {
-    progress.start(config.fps * config.seconds, 0);
+    progress.start(config.fps * config.seconds, config.startFrame);
   });
 
   wsevents.on('done', () => {
